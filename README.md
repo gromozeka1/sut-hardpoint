@@ -69,6 +69,40 @@ Reset the database (deletes the volume, so the seed data is recreated on next st
 docker compose down -v
 ```
 
+## Run with pre-built images
+
+Published images are on Docker Hub: [`gromozeka1/hardpoint-productapi`](https://hub.docker.com/r/gromozeka1/hardpoint-productapi) and [`gromozeka1/hardpoint-webapp`](https://hub.docker.com/r/gromozeka1/hardpoint-webapp). Tags: `latest` (every push to `main`), `sha-<shortsha>` (exact commit) and `vX.Y.Z` (releases).
+
+```sh
+docker pull gromozeka1/hardpoint-productapi:latest
+docker pull gromozeka1/hardpoint-webapp:latest
+
+# Shared network so the WebApp can reach the API by container name
+docker network create hardpoint
+
+docker run -d --name productapi --network hardpoint \
+  -p 5044:8080 \
+  -v productapi-data:/app/Database \
+  gromozeka1/hardpoint-productapi:latest
+
+docker run -d --name webapp --network hardpoint \
+  -p 5168:8080 \
+  -e ProductApi__BaseUrl=http://productapi:8080/ \
+  gromozeka1/hardpoint-webapp:latest
+```
+
+- WebApp: http://localhost:5168
+- ProductAPI: http://localhost:5044
+
+The named volume keeps the SQLite database (with seed data) across restarts; without `-v` the data is lost when the container is removed. Both containers run as a non-root user and listen on container port `8080`.
+
+Tear everything down:
+
+```sh
+docker rm -f webapp productapi
+docker network rm hardpoint
+```
+
 ## Run without Docker
 
 Start each project in its own terminal:
