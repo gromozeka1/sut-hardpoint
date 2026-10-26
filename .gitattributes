@@ -1,0 +1,16 @@
+# Enforce LF line endings for all text files on commit and checkout
+* text=auto eol=lf
+
+# Explicitly mark binary files so git never tries to normalise them
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.dll binary
+*.exe binary
+*.db  binary
+*.har binary
+*.webm binary
+*.pdf binary

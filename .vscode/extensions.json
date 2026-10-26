@@ -1,0 +1,7 @@
+﻿{
+  "recommendations": [
+    "ms-dotnettools.csdevkit",
+    "ms-playwright.playwright",
+    "reqnroll.reqnroll-ide-support-vscode"
+  ]
+}

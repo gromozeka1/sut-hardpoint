@@ -1,0 +1,27 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": true,
+    "launchOptions": {
+      "headless": false,
+      "slowMo": 0
+    },
+    "contextOptions": {
+      "ignoreHTTPSErrors": true
+    }
+  },
+  "capabilities": ["network", "storage", "testing", "devtools"],
+  "codegen": "csharp",
+  "outputDir": "TestResults/mcp",
+  "console": {
+    "level": "warning"
+  },
+  "timeouts": {
+    "action": 30000,
+    "navigation": 60000,
+    "expect": 5000,
+    "settle": 500
+  },
+  "testIdAttribute": "data-testid",
+  "imageResponses": "allow"
+}

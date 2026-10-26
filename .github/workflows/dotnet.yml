@@ -1,0 +1,115 @@
+name: HardPoint SUT
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+env:
+  CONFIGURATION: Release
+
+jobs:
+
+  unit-tests:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore HardPoint.slnx
+
+    - name: Build
+      run: dotnet build HardPoint.slnx --no-restore -c "$CONFIGURATION"
+
+    - name: Unit tests
+      run: dotnet test HardPoint.slnx --no-build -c "$CONFIGURATION" --logger "console;verbosity=normal"
+
+  coverage:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        global-json-file: global.json
+
+    # coverlet instruments each test run and fails it when total line coverage
+    # drops below the Threshold configured in the test project's .csproj (70%).
+    - name: ProductAPI coverage gate
+      run: >-
+        dotnet test ProductAPI.Tests/ProductAPI.Tests.csproj
+        -c "$CONFIGURATION"
+        -p:CollectCoverage=true
+        --logger "console;verbosity=normal"
+
+    - name: WebApp coverage gate
+      run: >-
+        dotnet test WebApp.Tests/WebApp.Tests.csproj
+        -c "$CONFIGURATION"
+        -p:CollectCoverage=true
+        --logger "console;verbosity=normal"
+
+    - name: Upload coverage report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-report
+        path: artifacts/coverage/
+        if-no-files-found: error
+
+  build-and-smoke:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        global-json-file: global.json
+
+    - name: Validate compose file
+      run: docker compose config --quiet
+
+    - name: Restore dependencies
+      run: dotnet restore HardPoint.slnx
+
+    - name: Build
+      run: dotnet build HardPoint.slnx --no-restore -c "$CONFIGURATION"
+
+    - name: Start application
+      run: docker compose up -d --build --wait --wait-timeout 180
+
+    - name: Smoke test
+      run: |
+        # WebApp renders the product list
+        curl --fail --silent --retry 30 --retry-delay 2 --retry-all-errors http://localhost:5168/ | grep -q "Products"
+        # API health probe
+        curl --fail --silent --retry 30 --retry-delay 2 --retry-all-errors http://localhost:5044/ | grep -q "Hello world"
+        # API contract: seeded product 1 is returned by the list and by id
+        curl --fail --silent http://localhost:5044/api/products | grep -q "Ryzen 7 7800X3D"
+        curl --fail --silent http://localhost:5044/api/products/1 | grep -q "\"id\":1"
+        # Product detail page in the WebApp
+        curl --fail --silent http://localhost:5168/Products/Details/1 | grep -q "Ryzen 7 7800X3D"
+
+    - name: Stop application
+      if: always()
+      run: docker compose down

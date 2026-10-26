@@ -1,0 +1,28 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": false,
+    "launchOptions": {
+      "headless": false,
+      "slowMo": 500,
+      "timeout": 30000,
+      "downloadsPath": "TestResults/Downloads",
+      "tracesDir": "TestResults/Traces"
+    },
+    "contextOptions": {
+      "ignoreHTTPSErrors": true,
+      "recordHarUrlFilter": "**/Product/**"
+    }
+  },
+  "outputDir": "TestResults",
+  "outputMode": "file",
+  "console": {
+    "level": "warning"
+  },
+  "timeouts": {
+    "action": 30000,
+    "navigation": 60000
+  },
+  "testIdAttribute": "data-testid",
+  "codegen": "none"
+}

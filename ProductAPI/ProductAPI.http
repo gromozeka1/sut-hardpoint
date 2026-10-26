@@ -1,0 +1,11 @@
+﻿@ProductAPI_HostAddress = https://localhost:7124
+
+
+
+GET {{ProductAPI_HostAddress}}/
+
+###
+
+GET {{ProductAPI_HostAddress}}/api/products
+
+###

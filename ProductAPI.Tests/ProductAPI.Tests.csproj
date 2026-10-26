@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>ProductAPI.Tests</RootNamespace>
+    <AssemblyName>ProductAPI.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProductAPI\ProductAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Coverage defaults used by `dotnet test /p:CollectCoverage=true` (local and CI coverage stage). -->
+  <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+    <CoverletOutputFormat>cobertura,json</CoverletOutputFormat>
+    <CoverletOutput>$(MSBuildThisFileDirectory)..\artifacts\coverage\productapi\</CoverletOutput>
+    <!-- Test assembly, source-generated OpenAPI comment code and EF migrations are not part of the metric. -->
+    <Exclude>[ProductAPI.Tests]*,[ProductAPI]Microsoft.AspNetCore.OpenApi.Generated.*,[ProductAPI]System.Runtime.CompilerServices.*,[ProductAPI]ProductAPI.Migrations.*</Exclude>
+    <SkipAutoProps>true</SkipAutoProps>
+    <!-- Quality gate: fails the test run when total line coverage drops below 70%. -->
+    <Threshold>70</Threshold>
+    <ThresholdType>line</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+  </PropertyGroup>
+
+</Project>

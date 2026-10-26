@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>WebApp.Tests</RootNamespace>
+    <AssemblyName>WebApp.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApp\WebApp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Coverage defaults used by `dotnet test /p:CollectCoverage=true` (local and CI coverage stage). -->
+  <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+    <CoverletOutputFormat>cobertura,json</CoverletOutputFormat>
+    <CoverletOutput>$(MSBuildThisFileDirectory)..\artifacts\coverage\webapp\</CoverletOutput>
+    <!--
+      Excluded from the metric:
+        [WebApp.Tests]*             the test assembly itself
+        AspNetCoreGeneratedDocument.*  Razor view code, compiled from .cshtml and only
+                                    executable through the HTTP pipeline (covered by the
+                                    build-and-smoke stage and the UI suite, not unit tests)
+    -->
+    <Exclude>[WebApp.Tests]*,[WebApp]AspNetCoreGeneratedDocument.*</Exclude>
+    <SkipAutoProps>true</SkipAutoProps>
+    <!-- Quality gate: fails the test run when total line coverage drops below 70%. -->
+    <Threshold>70</Threshold>
+    <ThresholdType>line</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+  </PropertyGroup>
+
+</Project>

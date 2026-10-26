@@ -1,0 +1,13 @@
+@model int
+@if (Model == 0)
+{
+    <span class="badge bg-danger">Out of stock</span>
+}
+else if (Model < 10)
+{
+    <span class="badge bg-warning text-dark">Low stock</span>
+}
+else
+{
+    <span class="badge bg-success">@Model in stock</span>
+}
