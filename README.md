@@ -8,7 +8,7 @@ HardPoint is a PC-hardware product-management application — an ASP.NET Core MV
 - `WebApp/` — MVC UI for viewing, searching, creating, editing and deleting products. All data access goes through the typed `ProductApiClient` HTTP client; the WebApp has no database access of its own.
 - `ProductAPI/` — REST API (`api/products`) with EF Core + SQLite persistence, migrations and OpenAPI generation.
 - `ProductAPI.Tests/` — xUnit unit tests for the API (controller behaviour, query filters, validation and conflict handling) against an isolated in-memory SQLite database per test.
-- `WebApp.Tests/` — xUnit unit tests for the MVC layer: `ProductsController` actions and ModelState/TempData handling, the `ProductApiClient` HTTP contract (via a fake `HttpMessageHandler`) and `ProductViewModel` validation.
+- `WebApp.Tests/` — xUnit tests for the MVC layer: `ProductsController` actions and ModelState/TempData handling, the `ProductApiClient` HTTP contract (via a fake `HttpMessageHandler`), `ProductViewModel` validation, and an integration suite that drives the real pipeline and Razor views through `TestServer` with a stubbed Product API.
 - `docker-compose.yml` + the two service Dockerfiles — the containerized stack used locally and in CI.
 - `Directory.Packages.props` — Central Package Management versions for this repository.
 - `global.json` — pins the .NET SDK (`10.0.100`, `rollForward: latestFeature`).
