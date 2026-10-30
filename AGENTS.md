@@ -9,7 +9,7 @@ This repository contains a .NET 10 solution (`HardPoint.slnx`) pinned by `global
 | `WebApp/` | ASP.NET Core MVC | Product storefront at `http://localhost:5168` (Docker: `webapp:8080`). Product list with search/filter, create, edit, details and delete views. All data access goes through the typed `ProductApiClient`. |
 | `ProductAPI/` | ASP.NET Core Web API | REST service at `http://localhost:5044` (Docker: `productapi:8080`) with SQLite persistence (`Database/ProductList.db`) via EF Core, migrations, seed data and OpenAPI generation. |
 | `ProductAPI.Tests/` | xUnit | Unit tests for the API: controller behaviour, query filters, conflict handling and the wire contract of `ProductType`. Each test runs against its own in-memory SQLite database, so real EF Core query translation is exercised. |
-| `WebApp.Tests/` | xUnit | Unit tests for the MVC layer: `ProductsController` actions (results, ModelState, TempData, 503 degradation), the `ProductApiClient` HTTP contract via a fake `HttpMessageHandler`, `ProductViewModel` validation and `HomeController`. |
+| `WebApp.Tests/` | xUnit | Unit tests for the MVC layer: `ProductsController` actions (results, ModelState, TempData, 503 degradation), the `ProductApiClient` HTTP contract via a fake `HttpMessageHandler`, `ProductViewModel` validation and `HomeController`. Plus integration tests in `Integration/`: routing, model binding, antiforgery, TempData and Razor rendering run for real on an in-memory `TestServer`, with `ProductApiStub` standing in for the Product API. |
 
 ### Dependency Flow & Isolation
 - `WebApp` calls `ProductAPI` **over HTTP only**, through the typed `ProductApiClient`; the base URL comes from `ProductApi:BaseUrl` (env: `ProductApi__BaseUrl`).
