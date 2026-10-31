@@ -1,4 +1,4 @@
-﻿namespace ProductAPI.Models;
+namespace ProductAPI.Models;
 
 public enum ProductType
 {

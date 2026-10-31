@@ -1,4 +1,4 @@
-﻿using WebApp.Services;
+using WebApp.Services;
 
 namespace WebApp;
 
