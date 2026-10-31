@@ -57,7 +57,7 @@ There is no compile-time reference between the two application projects; `WebApp
 
 ### Data & Configuration
 - SQLite file: `Database/ProductList.db`; in Docker it lives in the `productapi-data` volume.
-- `EnsureCreated()` seeds three products the first time the database file is created; reseed with `docker compose down -v`.
+- `Database.Migrate()` applies the migrations at startup, and they seed three products when the database is first created; reseed with `docker compose down -v`.
 - `ProductAPI.json` (OpenAPI) is generated at build time — do not edit it manually.
 - `ProductType` exists in both `ProductAPI/Models/ProductType.cs` (`PERIPHARALS`) and `WebApp/Models/ProductViewModel.cs` (`PERIPHERALS`); update both plus seed data whenever values change.
 

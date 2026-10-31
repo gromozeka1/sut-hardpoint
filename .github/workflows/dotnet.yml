@@ -34,7 +34,18 @@ jobs:
       run: dotnet build HardPoint.slnx --no-restore -c "$CONFIGURATION"
 
     - name: Unit tests
-      run: dotnet test HardPoint.slnx --no-build -c "$CONFIGURATION" --logger "console;verbosity=normal"
+      run: |
+        set -o pipefail
+        dotnet test HardPoint.slnx --no-build -c "$CONFIGURATION" --logger "console;verbosity=normal" | tee unit-test-run.log
+
+        # Sum the per-project VSTest summaries; each line reports Failed, Passed, Skipped, and Total.
+        total=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Total:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' unit-test-run.log)
+        passed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Passed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' unit-test-run.log)
+        failed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Failed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' unit-test-run.log)
+        skipped=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Skipped:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' unit-test-run.log)
+
+        printf 'Unit tests: %s tests, %s passed, %s failed, %s skipped' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
+        printf '\n\n| Result | Count |\n| --- | --- |\n| Total | %s |\n| Passed | %s |\n| Failed | %s |\n| Skipped | %s |\n' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
 
   coverage:
 
@@ -52,18 +63,36 @@ jobs:
     # coverlet instruments each test run and fails it when total line coverage
     # drops below the Threshold configured in the test project's .csproj (70%).
     - name: ProductAPI coverage gate
-      run: >-
-        dotnet test ProductAPI.Tests/ProductAPI.Tests.csproj
-        -c "$CONFIGURATION"
-        -p:CollectCoverage=true
-        --logger "console;verbosity=normal"
+      run: |
+        set -o pipefail
+        dotnet test ProductAPI.Tests/ProductAPI.Tests.csproj \
+          -c "$CONFIGURATION" \
+          -p:CollectCoverage=true \
+          --logger "console;verbosity=normal" | tee productapi-coverage.log
+
+        total=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Total:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' productapi-coverage.log)
+        passed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Passed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' productapi-coverage.log)
+        failed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Failed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' productapi-coverage.log)
+        skipped=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Skipped:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' productapi-coverage.log)
+
+        printf 'ProductAPI coverage gate: %s tests, %s passed, %s failed, %s skipped' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
+        printf '\n\n| Result | Count |\n| --- | --- |\n| Total | %s |\n| Passed | %s |\n| Failed | %s |\n| Skipped | %s |\n' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
 
     - name: WebApp coverage gate
-      run: >-
-        dotnet test WebApp.Tests/WebApp.Tests.csproj
-        -c "$CONFIGURATION"
-        -p:CollectCoverage=true
-        --logger "console;verbosity=normal"
+      run: |
+        set -o pipefail
+        dotnet test WebApp.Tests/WebApp.Tests.csproj \
+          -c "$CONFIGURATION" \
+          -p:CollectCoverage=true \
+          --logger "console;verbosity=normal" | tee webapp-coverage.log
+
+        total=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Total:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' webapp-coverage.log)
+        passed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Passed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' webapp-coverage.log)
+        failed=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Failed:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' webapp-coverage.log)
+        skipped=$(awk '/Passed!.*Failed:/ { for (i=1; i<=NF; i++) if ($i == "Skipped:") { value=$(i+1); gsub(/[^0-9]/, "", value); sum+=value } } END { print sum+0 }' webapp-coverage.log)
+
+        printf 'WebApp coverage gate: %s tests, %s passed, %s failed, %s skipped' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
+        printf '\n\n| Result | Count |\n| --- | --- |\n| Total | %s |\n| Passed | %s |\n| Failed | %s |\n| Skipped | %s |\n' "$total" "$passed" "$failed" "$skipped" >> "$GITHUB_STEP_SUMMARY"
 
     - name: Upload coverage report
       if: always()

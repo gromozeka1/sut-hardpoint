@@ -119,10 +119,9 @@ Both `launchSettings.json` files provide `http`, `https` and `Container (Dockerf
 | Setting | Default | Purpose |
 |---|---|---|
 | `ProductApi:BaseUrl` (`ProductApi__BaseUrl`) | `http://localhost:5044/` | WebApp → ProductAPI base URL |
-| `ConnectionStrings:ProductContext` | `Data Source=Database/ProductList.db` | SQLite database file |
 | `ASPNETCORE_ENVIRONMENT` | `Development` in Compose | Enables development logging/OpenAPI |
 
-`ProductAPI/Program.cs` calls `Database.EnsureCreated()` at startup: the schema and the seed rows below are created only when the database file does not exist yet. Delete the file (or `docker compose down -v`) to reseed.
+`ProductAPI/Program.cs` calls `Database.Migrate()` at startup, so the schema and the seed rows below are applied from `ProductAPI/Migrations/` when the database is first created. Delete the file (or `docker compose down -v`) to reseed.
 
 ## API reference
 
@@ -149,7 +148,7 @@ Base URL (local): `http://localhost:5044`
 
 ### ProductType enum
 
-`ProductType` is defined independently in three places — keep them aligned when adding values:
+`ProductType` is defined independently in two places — keep them aligned when adding values:
 
 | Location | Values |
 |---|---|
