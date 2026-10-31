@@ -30,7 +30,7 @@ Persistence: SQLite at `<ContentRoot>/Database/ProductList.db`. Seed data create
 | 2 | Dell UltraSharp 27 | MONITOR | 499 | 5 |
 | 3 | Logitech MX Master 3S | PERIPHARALS | 99 | 0 |
 
-Seed data is applied via `Database.EnsureCreated()` at startup — it is only inserted once when the database file is first created. Anything that reads seed product id `1` therefore depends on a fresh database; re-seed with `docker compose down -v` or by deleting the `.db` file.
+Seed data ships in the migrations applied by `Database.Migrate()` at startup — it is only inserted once when the database is first created. Anything that reads seed product id `1` therefore depends on a fresh database; re-seed with `docker compose down -v` or by deleting the `.db` file.
 
 ## ProductType Enum
 

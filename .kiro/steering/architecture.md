@@ -26,8 +26,8 @@ There is no compile-time reference between the two projects: `WebApp` never refe
 ### Query parameters instead of endpoints
 `GET api/products` accepts optional `search` (case-insensitive `Name` substring) and `type` (parsed to `ProductType`, `400` when unknown) query parameters, so filtering stays in the API rather than in the UI.
 
-### EnsureCreated + seed data
-`ProductAPI/Program.cs` calls `Database.EnsureCreated()` at startup. The schema and the three seed rows defined in `ProductContext.OnModelCreating` are created only when the database file does not exist. Re-seeding therefore requires deleting `Database/ProductList.db` or `docker compose down -v` — running migrations or restarting is not enough.
+### Migrations + seed data
+`ProductAPI/Program.cs` calls `Database.Migrate()` at startup, so pending migrations from `ProductAPI/Migrations/` are applied before the app serves requests. The three seed rows defined in `ProductContext.OnModelCreating` ship in the initial migration and are inserted once, when the migrations first run. Re-seeding therefore requires deleting `Database/ProductList.db` or `docker compose down -v`; restarting alone does not re-insert them.
 
 ### ProblemDetails-style conflicts
 Duplicate-name handling on POST/PUT returns `409` with a `ProblemDetails` body (`Title`, `Detail`, `Status`) instead of a generic 500, which is what the UI surfaces to users.

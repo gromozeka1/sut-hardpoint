@@ -106,8 +106,8 @@ Keep response semantics stable; `ProductApiClient` depends on them.
 JSON is serialized with the default camelCase policy; enum values are serialized as numbers.
 
 ### 3. Configuration & data
-- SQLite path: `ConnectionStrings:ProductContext` → `Data Source=Database/ProductList.db`; in Docker the directory is backed by the `productapi-data` volume.
-- `ProductAPI/Program.cs` calls `Database.EnsureCreated()` at startup: schema **and** seed rows are created only when the database file does not exist yet. To reseed, delete the file or run `docker compose down -v`.
+- SQLite path: `<ContentRoot>/Database/ProductList.db`, computed in `ProductAPI/Program.cs`; in Docker the directory is backed by the `productapi-data` volume.
+- `ProductAPI/Program.cs` calls `Database.Migrate()` at startup, applying `ProductAPI/Migrations/` (which include the seed rows) to the database. To reseed, delete the file or run `docker compose down -v`.
 - Never commit SQLite `.db` files (ignored by `.gitignore`).
 - `ProductAPI/ProductAPI.json` is regenerated at build time by `Microsoft.Extensions.ApiDescription.Server` — do not hand-edit it.
 
